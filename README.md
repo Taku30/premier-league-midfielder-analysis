@@ -30,6 +30,8 @@ The main objectives of this project were to:
 
 The dataset used in this project was derived from FBref player statistics from the completed 2025–2026 football season.
 
+Original data compiled from FBref football statistics.
+
 The original dataset contained player statistics from Europe’s top five leagues. For this project, the analysis was restricted to Premier League midfielders in order to maintain a more consistent tactical and statistical environment.
 
 To reduce statistical noise from extremely small sample sizes, players with fewer than 10 full 90-minute equivalents (900 minutes played) were excluded from the clustering and similarity analysis.
@@ -37,6 +39,14 @@ To reduce statistical noise from extremely small sample sizes, players with fewe
 This filtering step improves the reliability of per-90 performance metrics and reduces distortion caused by limited playing time.
 
 While per-90 normalization helps standardize player comparisons, minimum playing-time thresholds remain important in football analytics to ensure statistical stability and more meaningful interpretation.
+
+## Data Source
+
+The dataset used in this project was sourced from Kaggle:
+
+[Football Players Stats 2025–2026 Dataset](https://www.kaggle.com/datasets/hubertsidorowicz/football-players-stats-2025-2026/data?select=players_data-2025_2026.csv)
+
+Original data compiled from FBref football statistics.
 
 ---
 
