@@ -1,0 +1,4105 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.23">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Taku Takahashi">
+
+<title>Identifying Midfielder Archetypes in the Premier League Using Football Performance Data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="modern_midfielder_scouting_files/libs/clipboard/clipboard.min.js"></script>
+<script src="modern_midfielder_scouting_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="modern_midfielder_scouting_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="modern_midfielder_scouting_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="modern_midfielder_scouting_files/libs/quarto-html/popper.min.js"></script>
+<script src="modern_midfielder_scouting_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="modern_midfielder_scouting_files/libs/quarto-html/anchor.min.js"></script>
+<link href="modern_midfielder_scouting_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="modern_midfielder_scouting_files/libs/quarto-html/quarto-syntax-highlighting-1fe81d0376b2c50856e68e651e390326.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="modern_midfielder_scouting_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="modern_midfielder_scouting_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="modern_midfielder_scouting_files/libs/bootstrap/bootstrap-d6a003b94517c951b2d65075d42fb01b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Identifying Midfielder Archetypes in the Premier League Using Football Performance Data</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Taku Takahashi </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>Modern football has evolved significantly over the past decade, particularly in midfield roles. Midfielders are no longer evaluated solely based on technical quality such as passing range or creativity. In today’s game, midfielders are increasingly expected to contribute across multiple phases of play, including defensive transitions, pressing intensity, positional awareness, and physical output.</p>
+<p>The modern game has become faster, more transition-oriented, and more physically demanding. As a result, elite midfielders are often required to combine technical ability with defensive contribution, tactical discipline, and athletic intensity. Players who can contribute both offensively and defensively have become increasingly valuable in modern football systems.</p>
+<p>Because of these tactical developments, football clubs and analysts increasingly rely on performance data and statistical profiling to support scouting and recruitment decisions.</p>
+<p>This project explores how football statistics can be used to analyze and profile modern midfielders in the Premier League. The analysis focuses on identifying different midfielder characteristics and stylistic profiles using player performance data derived from FBref statistics.</p>
+<p>Rather than focusing only on traditional attacking statistics, this project emphasizes broader midfielder responsibilities such as:</p>
+<ul>
+<li>Defensive contribution</li>
+<li>Creative involvement</li>
+<li>Possession retention and involvement</li>
+<li>Transitional contribution</li>
+<li>Overall midfield balance</li>
+</ul>
+<p>The project combines football understanding with data analysis techniques in order to better understand what statistically defines modern Premier League midfielders.</p>
+</section>
+<section id="project-objectives" class="level1">
+<h1>Project Objectives</h1>
+<p>The main objectives of this project are to:</p>
+<ul>
+<li>Analyze statistical characteristics of Premier League midfielders</li>
+<li>Explore how modern midfielder roles differ across playing styles</li>
+<li>Identify different midfielder archetypes using performance metrics</li>
+<li>Compare players based on stylistic similarities</li>
+<li>Investigate undervalued or less recognized midfielder profiles</li>
+</ul>
+<p>The project also aims to demonstrate how football analytics can support scouting and player evaluation in modern football environments.</p>
+</section>
+<section id="scope-of-analysis" class="level1">
+<h1>Scope of Analysis</h1>
+<p>Although the original dataset contains player statistics from Europe’s top five leagues, this project focuses specifically on Premier League midfielders.</p>
+<p>The Premier League was selected because of:</p>
+<ul>
+<li>Its high physical intensity</li>
+<li>Tactical competitiveness</li>
+<li>Transition-heavy style of play</li>
+<li>Strong global relevance in modern football analysis</li>
+</ul>
+<p>Restricting the analysis to a single league also helps maintain a more consistent tactical and statistical environment when comparing midfielder profiles.</p>
+</section>
+<section id="data-source" class="level1">
+<h1>Data Source</h1>
+<p>The dataset used in this project contains player performance statistics from the completed 2025–2026 football season and is derived from FBref data.</p>
+<p>FBref is one of the most widely recognized football statistics platforms used in football analytics and scouting communities. The platform provides detailed player and team statistics sourced from Opta, including:</p>
+<ul>
+<li>Goal contribution metrics</li>
+<li>Shooting statistics</li>
+<li>Defensive actions</li>
+<li>Match participation metrics</li>
+<li>Discipline statistics</li>
+<li>General player performance indicators</li>
+</ul>
+<p>The dataset contains over 100 statistical variables related to player performance across multiple competitions and leagues.</p>
+<p>For this project, the dataset is filtered specifically for Premier League midfielders in order to focus the analysis on modern midfield roles within a more consistent football environment.</p>
+</section>
+<section id="important-considerations" class="level1">
+<h1>Important Considerations</h1>
+<p>Football performance cannot be fully explained through statistics alone. Many important aspects of football remain difficult to quantify, including:</p>
+<ul>
+<li>Tactical intelligence</li>
+<li>Communication</li>
+<li>Leadership</li>
+<li>Off-ball movement</li>
+<li>Team tactical structure</li>
+<li>Decision-making under pressure</li>
+</ul>
+<p>Therefore, this project should be viewed as a data-assisted football profiling and scouting exercise rather than a complete measure of player quality.</p>
+<p>Additionally, player statistics can be influenced by:</p>
+<ul>
+<li>Team tactics</li>
+<li>Coaching systems</li>
+<li>Teammate quality</li>
+<li>Match context</li>
+<li>Playing time and role consistency</li>
+</ul>
+<p>For this reason, football context remains essential when interpreting statistical output.</p>
+</section>
+<section id="tools-and-technologies" class="level1">
+<h1>Tools and Technologies</h1>
+<p>This project uses:</p>
+<p>R</p>
+<p>Quarto</p>
+<p>tidyverse</p>
+<p>ggplot2</p>
+<p>factoextra</p>
+<p>cluster</p>
+<p>gt</p>
+<p>The workflow includes:</p>
+<p>Data cleaning and preprocessing</p>
+<p>Exploratory data analysis</p>
+<p>Midfielder-focused feature selection</p>
+<p>Per-90 normalization and outlier handling</p>
+<p>Clustering and archetype identification</p>
+<p>Statistical player similarity analysis</p>
+<p>Football-specific interpretation of analytical results</p>
+<hr>
+</section>
+<section id="data-loading-and-initial-preparation" class="level1">
+<h1>Data Loading and Initial Preparation</h1>
+<p>Before beginning the analysis, the dataset is loaded and inspected in order to understand:</p>
+<ul>
+<li>Dataset structure</li>
+<li>Available variables</li>
+<li>Position labels</li>
+<li>League information</li>
+<li>Potential cleaning requirements</li>
+</ul>
+<p>The initial preparation stage also standardizes column names and prepares the dataset for midfielder-focused analysis.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cluster)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(factoextra)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="load-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="load-dataset">Load Dataset</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../data/players_data-2025_2026.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="data-cleaning-and-preprocessing" class="level1">
+<h1>Data Cleaning and Preprocessing</h1>
+<p>Before beginning exploratory analysis, the dataset is cleaned and filtered in order to create a more consistent analytical sample focused on Premier League midfielders.</p>
+<p>This stage includes:</p>
+<ul>
+<li>Standardizing column names</li>
+<li>Filtering midfielder positions</li>
+<li>Removing duplicated player entries caused by mid-season transfers</li>
+<li>Restricting the dataset to Premier League players</li>
+<li>Preparing the dataset for exploratory analysis and player profiling</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#names(df)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="midfielder-filtering" class="level2">
+<h2 class="anchored" data-anchor-id="midfielder-filtering">Midfielder Filtering</h2>
+<p>Modern football positions are increasingly fluid and role-based rather than strictly positional.</p>
+<p>For this reason, the analysis includes players whose position labels contain midfield roles, including hybrid positions such as:</p>
+<ul>
+<li>MF</li>
+<li>DF,MF</li>
+<li>MF,FW</li>
+<li>FW,MF</li>
+</ul>
+<p>This approach better reflects the tactical flexibility of modern midfield roles in modern football.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>midfielders <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(pos, <span class="st">"MF"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="handling-mid-season-transfers" class="level2">
+<h2 class="anchored" data-anchor-id="handling-mid-season-transfers">Handling Mid-Season Transfers</h2>
+<p>Players who represented multiple clubs during the season were excluded from the analysis.</p>
+<p>Because player performance is strongly influenced by tactical environment, teammate quality, and coaching systems, only players who remained within a single club environment were retained for analysis.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>midfielders_clean <span class="ot">&lt;-</span> midfielders <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(player) <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="section" class="level2">
+<h2 class="anchored" data-anchor-id="section"></h2>
+<p><strong>Filter Premier League Midfielders</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>prem_midfielders <span class="ot">&lt;-</span> midfielders_clean <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(comp <span class="sc">==</span> <span class="st">"eng Premier League"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(prem_midfielders)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 272 102</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(prem_midfielders<span class="sc">$</span>pos)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+DF,MF FW,MF    MF MF,DF MF,FW 
+   32    29   167    16    28 </code></pre>
+</div>
+</div>
+</section>
+<section id="final-positional-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="final-positional-distribution">Final Positional Distribution</h2>
+<p>The final analytical dataset includes both traditional and hybrid midfield roles.</p>
+<p>This reflects the increasing tactical fluidity of modern football, where midfield responsibilities are often shared across multiple positional structures.</p>
+<p>The dataset includes:</p>
+<ul>
+<li><p>Central midfielders</p></li>
+<li><p>Defensive-midfield hybrids</p></li>
+<li><p>Advanced attacking midfielders</p></li>
+<li><p>Wide midfield hybrids</p></li>
+</ul>
+<p>This approach allows the analysis to better capture the diversity of modern Premier League midfield roles.</p>
+<hr>
+</section>
+</section>
+<section id="exploratory-data-analysis-eda" class="level1">
+<h1>Exploratory Data Analysis (EDA)</h1>
+<p>The exploratory analysis focuses on understanding the statistical characteristics and role diversity of modern Premier League midfielders.</p>
+<p>Rather than performing broad generic exploration, the EDA is designed to investigate football-specific questions related to:</p>
+<ul>
+<li><p>Midfielder age profiles</p></li>
+<li><p>Positional flexibility</p></li>
+<li><p>Playing time distribution</p></li>
+<li><p>Offensive contribution</p></li>
+<li><p>Defensive involvement</p></li>
+<li><p>Balance between creativity and defensive work</p></li>
+</ul>
+<p>The purpose of this section is to better understand the structure of the dataset before building midfielder archetypes and similarity models.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>football_theme <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">plot.title =</span> <span class="fu">element_text</span>(</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">size =</span> <span class="dv">18</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">face =</span> <span class="st">"bold"</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">hjust =</span> <span class="fl">0.5</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">size =</span> <span class="dv">11</span>,</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">hjust =</span> <span class="fl">0.5</span>,</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> <span class="st">"gray40"</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.title =</span> <span class="fu">element_text</span>(</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">size =</span> <span class="dv">12</span>,</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">face =</span> <span class="st">"bold"</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.text =</span> <span class="fu">element_text</span>(</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">size =</span> <span class="dv">10</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">panel.grid.major =</span> <span class="fu">element_line</span>(</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> <span class="st">"gray90"</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="age-distribution-of-midfielders" class="level2">
+<h2 class="anchored" data-anchor-id="age-distribution-of-midfielders">Age Distribution of Midfielders</h2>
+<p>Modern midfield roles require a balance between physical intensity, tactical understanding, and technical consistency.</p>
+<p>Analyzing the age distribution of Premier League midfielders may help reveal the age ranges most commonly associated with regular midfield involvement in the modern game.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(prem_midfielders, <span class="fu">aes</span>(<span class="at">x =</span> age)) <span class="sc">+</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">binwidth =</span> <span class="dv">1</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"#1b4332"</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"white"</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.9</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Age Distribution of Premier League Midfielders"</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Distribution of midfielder ages within the analytical dataset"</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age"</span>,</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of Players"</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">football_theme</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="modern_midfielder_scouting_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="positional-flexibility" class="level2">
+<h2 class="anchored" data-anchor-id="positional-flexibility">Positional Flexibility</h2>
+<p>Modern football increasingly relies on hybrid positional roles rather than rigid positional structures.</p>
+<p>This visualization shows the distribution of positional labels among Premier League midfielders included in the dataset.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>prem_midfielders <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(pos) <span class="sc">%&gt;%</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(pos, n), <span class="at">y =</span> n, <span class="at">fill =</span> pos)) <span class="sc">+</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Positional Distribution of Midfielders"</span>,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Hybrid midfield roles are increasingly common in modern football"</span>,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Position"</span>,</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of Players"</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"Greens"</span>) <span class="sc">+</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">football_theme</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="modern_midfielder_scouting_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="playing-time-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="playing-time-distribution">Playing Time Distribution</h2>
+<p>Playing time is an important consideration in football analytics because statistical reliability is strongly influenced by sample size.</p>
+<p>This visualization shows the distribution of minutes played among Premier League midfielders included in the analysis.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(prem_midfielders, <span class="fu">aes</span>(<span class="at">x =</span> min)) <span class="sc">+</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">binwidth =</span> <span class="dv">250</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"#1d3557"</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"white"</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.9</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Minutes Played Distribution"</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Distribution of playing time among Premier League midfielders"</span>,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Minutes Played"</span>,</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of Players"</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">football_theme</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="modern_midfielder_scouting_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="defensive-contribution-vs-offensive-output" class="level2">
+<h2 class="anchored" data-anchor-id="defensive-contribution-vs-offensive-output">Defensive Contribution vs Offensive Output</h2>
+<p>One of the defining characteristics of modern midfielders is the increasing expectation to contribute in multiple phases of play.</p>
+<p>This visualization explores the relationship between defensive contribution and offensive production among Premier League midfielders.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  prem_midfielders,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> tkl_w,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> g_a</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"#2a9d8f"</span>,</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.75</span>,</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">3</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"lm"</span>,</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">se =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"darkred"</span>,</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth =</span> <span class="dv">1</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Defensive Contribution vs Offensive Output"</span>,</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Relationship between tackles won and goal contribution"</span>,</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Tackles Won"</span>,</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Goals + Assists"</span></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">football_theme</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="modern_midfielder_scouting_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="top-holding-midfielders" class="level2">
+<h2 class="anchored" data-anchor-id="top-holding-midfielders">Top Holding Midfielders</h2>
+<p>Defensive contribution remains one of the most important responsibilities in modern midfield play, particularly in transition-heavy leagues such as the Premier League.</p>
+<p>The table below highlights midfielders with the strongest tackle-winning output.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>prem_midfielders <span class="sc">%&gt;%</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(player, squad, tkl_w, int, g_a) <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(tkl_w)) <span class="sc">%&gt;%</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Top Holding Midfielders"</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">player =</span> <span class="st">"Player"</span>,</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">squad =</span> <span class="st">"Club"</span>,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">tkl_w =</span> <span class="st">"Tackles Won"</span>,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">int =</span> <span class="st">"Interceptions"</span>,</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">g_a =</span> <span class="st">"Goals + Assists"</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data_color</span>(</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">c</span>(tkl_w, int),</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">colors =</span> scales<span class="sc">::</span><span class="fu">col_numeric</span>(</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"darkgreen"</span>),</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">domain =</span> <span class="cn">NULL</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="tmjtgingca" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#tmjtgingca table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#tmjtgingca thead, #tmjtgingca tbody, #tmjtgingca tfoot, #tmjtgingca tr, #tmjtgingca td, #tmjtgingca th {
+  border-style: none;
+}
+
+#tmjtgingca p {
+  margin: 0;
+  padding: 0;
+}
+
+#tmjtgingca .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#tmjtgingca .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#tmjtgingca .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#tmjtgingca .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#tmjtgingca .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#tmjtgingca .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tmjtgingca .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#tmjtgingca .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#tmjtgingca .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#tmjtgingca .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#tmjtgingca .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#tmjtgingca .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#tmjtgingca .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#tmjtgingca .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#tmjtgingca .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#tmjtgingca .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#tmjtgingca .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#tmjtgingca .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#tmjtgingca .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tmjtgingca .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#tmjtgingca .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#tmjtgingca .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#tmjtgingca .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tmjtgingca .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#tmjtgingca .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#tmjtgingca .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tmjtgingca .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tmjtgingca .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#tmjtgingca .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tmjtgingca .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#tmjtgingca .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tmjtgingca .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#tmjtgingca .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tmjtgingca .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#tmjtgingca .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tmjtgingca .gt_left {
+  text-align: left;
+}
+
+#tmjtgingca .gt_center {
+  text-align: center;
+}
+
+#tmjtgingca .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#tmjtgingca .gt_font_normal {
+  font-weight: normal;
+}
+
+#tmjtgingca .gt_font_bold {
+  font-weight: bold;
+}
+
+#tmjtgingca .gt_font_italic {
+  font-style: italic;
+}
+
+#tmjtgingca .gt_super {
+  font-size: 65%;
+}
+
+#tmjtgingca .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#tmjtgingca .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#tmjtgingca .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#tmjtgingca .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#tmjtgingca .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#tmjtgingca .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#tmjtgingca .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#tmjtgingca .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#tmjtgingca div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="5" class="gt_heading gt_title gt_font_normal gt_bottom_border">Top Holding Midfielders</td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="player" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Player</th>
+<th id="squad" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Club</th>
+<th id="tkl_w" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Tackles Won</th>
+<th id="int" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Interceptions</th>
+<th id="g_a" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Goals + Assists</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">James Garner</td>
+<td class="gt_row gt_left" headers="squad">Everton</td>
+<td class="gt_row gt_right" headers="tkl_w" style="background-color: #006400; color: #FFFFFF">72</td>
+<td class="gt_row gt_right" headers="int" style="background-color: #006400; color: #FFFFFF">57</td>
+<td class="gt_row gt_right" headers="g_a">9</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">João Gomes</td>
+<td class="gt_row gt_left" headers="squad">Wolves</td>
+<td class="gt_row gt_right" headers="tkl_w" style="background-color: #3D7D30; color: #FFFFFF">68</td>
+<td class="gt_row gt_right" headers="int" style="background-color: #97B88C; color: #000000">36</td>
+<td class="gt_row gt_right" headers="g_a">2</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Mateus Fernandes</td>
+<td class="gt_row gt_left" headers="squad">West Ham United</td>
+<td class="gt_row gt_right" headers="tkl_w" style="background-color: #48833A; color: #FFFFFF">67</td>
+<td class="gt_row gt_right" headers="int" style="background-color: #97B88C; color: #000000">36</td>
+<td class="gt_row gt_right" headers="g_a">7</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Tyrick Mitchell</td>
+<td class="gt_row gt_left" headers="squad">Crystal Palace</td>
+<td class="gt_row gt_right" headers="tkl_w" style="background-color: #5C904E; color: #FFFFFF">65</td>
+<td class="gt_row gt_right" headers="int" style="background-color: #A9C4A0; color: #000000">33</td>
+<td class="gt_row gt_right" headers="g_a">3</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">João Palhinha</td>
+<td class="gt_row gt_left" headers="squad">Tottenham Hotspur</td>
+<td class="gt_row gt_right" headers="tkl_w" style="background-color: #82AA75; color: #FFFFFF">61</td>
+<td class="gt_row gt_right" headers="int" style="background-color: #C8D9C1; color: #000000">28</td>
+<td class="gt_row gt_right" headers="g_a">7</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Elliot Anderson</td>
+<td class="gt_row gt_left" headers="squad">Nottingham Forest</td>
+<td class="gt_row gt_right" headers="tkl_w" style="background-color: #8BB07F; color: #000000">60</td>
+<td class="gt_row gt_right" headers="int" style="background-color: #7AA46C; color: #FFFFFF">41</td>
+<td class="gt_row gt_right" headers="g_a">8</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Enzo Le Fée</td>
+<td class="gt_row gt_left" headers="squad">Sunderland</td>
+<td class="gt_row gt_right" headers="tkl_w" style="background-color: #B1CAA9; color: #000000">56</td>
+<td class="gt_row gt_right" headers="int" style="background-color: #C8D9C1; color: #000000">28</td>
+<td class="gt_row gt_right" headers="g_a">11</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Diego Gómez</td>
+<td class="gt_row gt_left" headers="squad">Brighton</td>
+<td class="gt_row gt_right" headers="tkl_w" style="background-color: #F5F8F4; color: #000000">49</td>
+<td class="gt_row gt_right" headers="int" style="background-color: #FFFFFF; color: #000000">19</td>
+<td class="gt_row gt_right" headers="g_a">6</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Florentino Luís</td>
+<td class="gt_row gt_left" headers="squad">Burnley</td>
+<td class="gt_row gt_right" headers="tkl_w" style="background-color: #F5F8F4; color: #000000">49</td>
+<td class="gt_row gt_right" headers="int" style="background-color: #7FA873; color: #FFFFFF">40</td>
+<td class="gt_row gt_right" headers="g_a">2</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Daniel Muñoz</td>
+<td class="gt_row gt_left" headers="squad">Crystal Palace</td>
+<td class="gt_row gt_right" headers="tkl_w" style="background-color: #FFFFFF; color: #000000">48</td>
+<td class="gt_row gt_right" headers="int" style="background-color: #E0EADC; color: #000000">24</td>
+<td class="gt_row gt_right" headers="g_a">7</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="offensive-and-creative-contribution" class="level2">
+<h2 class="anchored" data-anchor-id="offensive-and-creative-contribution">Offensive and Creative Contribution</h2>
+<p>While modern midfielders are increasingly expected to contribute defensively, offensive production and creativity remain highly valuable aspects of midfield performance.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>prem_midfielders <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(g_a)) <span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">15</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">reorder</span>(player, g_a),</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> g_a</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Top Midfielders by Goals + Assists"</span>,</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Player"</span>,</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Goals + Assists"</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">football_theme</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="modern_midfielder_scouting_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="midfielder-profiling-framework" class="level1">
+<h1>Midfielder Profiling Framework</h1>
+<p>After exploring the overall structure of the dataset, the next stage focuses on defining statistical dimensions that represent different aspects of modern midfield performance.</p>
+<p>Rather than evaluating midfielders using only traditional attacking statistics, this framework attempts to capture broader midfield responsibilities in the modern Premier League.</p>
+<p>The profiling framework focuses on:</p>
+<ul>
+<li><p>Offensive contribution</p></li>
+<li><p>Defensive involvement</p></li>
+<li><p>Playing time and match participation</p></li>
+<li><p>Statistical balance across multiple phases of play</p></li>
+</ul>
+<p>These dimensions will later be used for midfielder archetype analysis and player similarity modeling.</p>
+<section id="statistical-dimensions-of-midfielder-performance" class="level2">
+<h2 class="anchored" data-anchor-id="statistical-dimensions-of-midfielder-performance">Statistical Dimensions of Midfielder Performance</h2>
+<p>In modern football, midfielders are expected to contribute across multiple phases of play rather than specializing in only a single role.</p>
+<p>To better capture different midfielder profiles, the analysis groups performance metrics into several broader statistical dimensions.</p>
+<section id="offensive-contribution" class="level3">
+<h3 class="anchored" data-anchor-id="offensive-contribution">Offensive Contribution</h3>
+<p>Variables related to attacking production and shot involvement:</p>
+<ul>
+<li><p>Goals</p></li>
+<li><p>Assists</p></li>
+<li><p>Goals + Assists</p></li>
+<li><p>Shots</p></li>
+<li><p>Shots on Target</p></li>
+</ul>
+</section>
+<section id="defensive-contribution" class="level3">
+<h3 class="anchored" data-anchor-id="defensive-contribution">Defensive Contribution</h3>
+<p>Variables related to defensive activity and ball recovery:</p>
+<ul>
+<li><p>Tackles Won</p></li>
+<li><p>Interceptions</p></li>
+<li><p>Fouls Committed</p></li>
+</ul>
+</section>
+<section id="match-involvement" class="level3">
+<h3 class="anchored" data-anchor-id="match-involvement">Match Involvement</h3>
+<p>Variables related to playing time and participation:</p>
+<ul>
+<li><p>Matches Played</p></li>
+<li><p>Starts</p></li>
+<li><p>Minutes Played</p></li>
+</ul>
+</section>
+<section id="discipline-and-control" class="level3">
+<h3 class="anchored" data-anchor-id="discipline-and-control">Discipline and Control</h3>
+<p>Variables related to player discipline:</p>
+<ul>
+<li><p>Yellow Cards</p></li>
+<li><p>Red Cards</p></li>
+</ul>
+<p>These dimensions are later used to explore midfielder archetypes and statistical similarities between players.</p>
+</section>
+</section>
+</section>
+<section id="midfielder-archetype-analysis" class="level1">
+<h1>Midfielder Archetype Analysis</h1>
+<p>Modern midfielders perform a wide variety of tactical and statistical roles within Premier League football.</p>
+<p>Some midfielders contribute heavily in defensive phases, while others focus more on attacking output, ball progression, or balanced two-way play.</p>
+<p>To better understand these stylistic differences, clustering analysis is used to group midfielders with similar statistical profiles into broader archetypes.</p>
+<section id="per-90-normalization" class="level2">
+<h2 class="anchored" data-anchor-id="per-90-normalization">Per-90 Normalization</h2>
+<p>Raw cumulative statistics are heavily influenced by playing time and match involvement.</p>
+<p>To better compare midfielder playing styles independent of total minutes played, several statistical variables are converted into per-90 metrics.</p>
+<p>Per-90 normalization helps estimate contribution rates rather than total accumulation, allowing for more balanced player comparisons during clustering and similarity analysis.</p>
+<p>To reduce statistical noise from extremely small sample sizes, players with fewer than 10 full 90-minute equivalents (900 minutes played) were excluded from the clustering and similarity analysis.</p>
+<p>This filtering step improves the reliability of per-90 performance metrics and reduces distortion caused by limited playing time.</p>
+<p>While per-90 normalization helps standardize player comparisons, minimum playing-time thresholds remain important in football analytics to ensure statistical stability and more meaningful interpretation.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>midfielder_profiles <span class="ot">&lt;-</span> prem_midfielders <span class="sc">%&gt;%</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    player,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    squad,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    age,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    pos,</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    x90s,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    gls,</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    ast,</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    g_a,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    sh,</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    so_t,</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    tkl_w,</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    int,</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    fls,</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    crd_y,</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>    crd_r</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(x90s <span class="sc">&gt;=</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">gls_per90 =</span> gls <span class="sc">/</span> x90s,</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">ast_per90 =</span> ast <span class="sc">/</span> x90s,</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">g_a_per90 =</span> g_a <span class="sc">/</span> x90s,</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">sh_per90 =</span> sh <span class="sc">/</span> x90s,</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">sot_per90 =</span> so_t <span class="sc">/</span> x90s,</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">tkl_per90 =</span> tkl_w <span class="sc">/</span> x90s,</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">int_per90 =</span> int <span class="sc">/</span> x90s,</span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">fls_per90 =</span> fls <span class="sc">/</span> x90s</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="determining-the-number-of-clusters" class="level2">
+<h2 class="anchored" data-anchor-id="determining-the-number-of-clusters">Determining the Number of Clusters</h2>
+<p>Before performing clustering analysis, the Elbow Method is used to estimate an appropriate number of midfielder clusters.</p>
+<p>The Elbow Method helps identify the point where adding additional clusters produces diminishing improvements in cluster separation.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>midfielder_profiles <span class="ot">&lt;-</span> midfielder_profiles <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">gls_per90 =</span> <span class="fu">pmin</span>(gls_per90, <span class="fu">quantile</span>(gls_per90, <span class="fl">0.99</span>)),</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">ast_per90 =</span> <span class="fu">pmin</span>(ast_per90, <span class="fu">quantile</span>(ast_per90, <span class="fl">0.99</span>)),</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">g_a_per90 =</span> <span class="fu">pmin</span>(g_a_per90, <span class="fu">quantile</span>(g_a_per90, <span class="fl">0.99</span>)),</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">sh_per90 =</span> <span class="fu">pmin</span>(sh_per90, <span class="fu">quantile</span>(sh_per90, <span class="fl">0.99</span>)),</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">sot_per90 =</span> <span class="fu">pmin</span>(sot_per90, <span class="fu">quantile</span>(sot_per90, <span class="fl">0.99</span>)),</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">tkl_per90 =</span> <span class="fu">pmin</span>(tkl_per90, <span class="fu">quantile</span>(tkl_per90, <span class="fl">0.99</span>)),</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">int_per90 =</span> <span class="fu">pmin</span>(int_per90, <span class="fu">quantile</span>(int_per90, <span class="fl">0.99</span>)),</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">fls_per90 =</span> <span class="fu">pmin</span>(fls_per90, <span class="fu">quantile</span>(fls_per90, <span class="fl">0.99</span>))</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>midfielder_scaled <span class="ot">&lt;-</span> midfielder_profiles <span class="sc">%&gt;%</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    gls_per90,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    ast_per90,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    g_a_per90,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    sh_per90,</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    sot_per90,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    tkl_per90,</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    int_per90,</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    fls_per90</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  midfielder_scaled,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  kmeans,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"wss"</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Elbow Method for Optimal Number of Clusters"</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">football_theme</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="modern_midfielder_scouting_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="determining-the-number-of-clusters-1" class="level2">
+<h2 class="anchored" data-anchor-id="determining-the-number-of-clusters-1">Determining the Number of Clusters</h2>
+<p>The Elbow Method was used to estimate an appropriate number of midfielder clusters.</p>
+<p>Although the elbow pattern is not perfectly distinct after per-90 normalization, four clusters were selected because they provided a reasonable balance between:</p>
+<ul>
+<li>Statistical separation</li>
+<li>Interpretability</li>
+<li>Football-specific role distinctions</li>
+</ul>
+<p>This reflects the reality that modern midfield roles often overlap stylistically rather than forming perfectly isolated categories.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>kmeans_result <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  midfielder_scaled,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">centers =</span> <span class="dv">4</span>,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">nstart =</span> <span class="dv">25</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="midfielder-archetype-visualization" class="level2">
+<h2 class="anchored" data-anchor-id="midfielder-archetype-visualization">Midfielder Archetype Visualization</h2>
+<p>The visualization below shows how midfielders are grouped into broader statistical archetypes based on their overall performance profiles.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  kmeans_result,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> midfielder_scaled,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">geom =</span> <span class="st">"point"</span>,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">ellipse.type =</span> <span class="st">"norm"</span>,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">palette =</span> <span class="fu">c</span>(</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#264653"</span>,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#2a9d8f"</span>,</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#e9c46a"</span>,</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#e76f51"</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">ggtheme =</span> <span class="fu">theme_minimal</span>()</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Premier League Midfielder Archetypes"</span>,</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"K-Means clustering using standardized per-90 performance metrics"</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">football_theme</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="modern_midfielder_scouting_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="cluster-profile-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="cluster-profile-comparison">Cluster Profile Comparison</h2>
+<p>To better understand the characteristics of each midfielder archetype, average statistical values are compared across clusters.</p>
+<p>This helps identify the defining traits associated with each statistical midfielder profile.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>midfielder_profiles<span class="sc">$</span>cluster <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(kmeans_result<span class="sc">$</span>cluster)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>midfielder_profiles <span class="ot">&lt;-</span> midfielder_profiles <span class="sc">%&gt;%</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">archetype =</span> <span class="fu">case_when</span>(</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>      cluster <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Defensive Midfielders"</span>,</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>      cluster <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"Box-to-Box Midfielders"</span>,</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>      cluster <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">"Attacking Midfielders"</span>,</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>      cluster <span class="sc">==</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">"Holding Midfielders"</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>midfielder_profiles <span class="sc">%&gt;%</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(archetype) <span class="sc">%&gt;%</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">goals_per90 =</span> <span class="fu">mean</span>(gls_per90),</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">assists_per90 =</span> <span class="fu">mean</span>(ast_per90),</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">goals_assists_per90 =</span> <span class="fu">mean</span>(g_a_per90),</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">shots_per90 =</span> <span class="fu">mean</span>(sh_per90),</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">tackles_per90 =</span> <span class="fu">mean</span>(tkl_per90),</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">interceptions_per90 =</span> <span class="fu">mean</span>(int_per90),</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">fouls_per90 =</span> <span class="fu">mean</span>(fls_per90)</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Statistical Comparison of Midfielder Archetypes"</span></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">where</span>(is.numeric),</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">2</span></span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">archetype =</span> <span class="st">"Archetype"</span>,</span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">goals_per90 =</span> <span class="st">"Goals /90"</span>,</span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">assists_per90 =</span> <span class="st">"Assists /90"</span>,</span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">goals_assists_per90 =</span> <span class="st">"G+A /90"</span>,</span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">shots_per90 =</span> <span class="st">"Shots /90"</span>,</span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">tackles_per90 =</span> <span class="st">"Tackles /90"</span>,</span>
+<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">interceptions_per90 =</span> <span class="st">"Interceptions /90"</span>,</span>
+<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">fouls_per90 =</span> <span class="st">"Fouls /90"</span></span>
+<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_options</span>(</span>
+<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">table.font.size =</span> <span class="fu">px</span>(<span class="dv">13</span>),</span>
+<span id="cb26-39"><a href="#cb26-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">heading.title.font.size =</span> <span class="fu">px</span>(<span class="dv">18</span>),</span>
+<span id="cb26-40"><a href="#cb26-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">data_row.padding =</span> <span class="fu">px</span>(<span class="dv">5</span>)</span>
+<span id="cb26-41"><a href="#cb26-41" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="lbjvltnqnv" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#lbjvltnqnv table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#lbjvltnqnv thead, #lbjvltnqnv tbody, #lbjvltnqnv tfoot, #lbjvltnqnv tr, #lbjvltnqnv td, #lbjvltnqnv th {
+  border-style: none;
+}
+
+#lbjvltnqnv p {
+  margin: 0;
+  padding: 0;
+}
+
+#lbjvltnqnv .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 13px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#lbjvltnqnv .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#lbjvltnqnv .gt_title {
+  color: #333333;
+  font-size: 18px;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#lbjvltnqnv .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#lbjvltnqnv .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#lbjvltnqnv .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lbjvltnqnv .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#lbjvltnqnv .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#lbjvltnqnv .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#lbjvltnqnv .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#lbjvltnqnv .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#lbjvltnqnv .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#lbjvltnqnv .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#lbjvltnqnv .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#lbjvltnqnv .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#lbjvltnqnv .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#lbjvltnqnv .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#lbjvltnqnv .gt_row {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#lbjvltnqnv .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lbjvltnqnv .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#lbjvltnqnv .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#lbjvltnqnv .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#lbjvltnqnv .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lbjvltnqnv .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#lbjvltnqnv .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#lbjvltnqnv .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lbjvltnqnv .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lbjvltnqnv .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#lbjvltnqnv .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lbjvltnqnv .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#lbjvltnqnv .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lbjvltnqnv .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#lbjvltnqnv .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lbjvltnqnv .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#lbjvltnqnv .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lbjvltnqnv .gt_left {
+  text-align: left;
+}
+
+#lbjvltnqnv .gt_center {
+  text-align: center;
+}
+
+#lbjvltnqnv .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#lbjvltnqnv .gt_font_normal {
+  font-weight: normal;
+}
+
+#lbjvltnqnv .gt_font_bold {
+  font-weight: bold;
+}
+
+#lbjvltnqnv .gt_font_italic {
+  font-style: italic;
+}
+
+#lbjvltnqnv .gt_super {
+  font-size: 65%;
+}
+
+#lbjvltnqnv .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#lbjvltnqnv .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#lbjvltnqnv .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#lbjvltnqnv .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#lbjvltnqnv .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#lbjvltnqnv .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#lbjvltnqnv .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#lbjvltnqnv .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#lbjvltnqnv div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="8" class="gt_heading gt_title gt_font_normal gt_bottom_border">Statistical Comparison of Midfielder Archetypes</td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="archetype" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Archetype</th>
+<th id="goals_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Goals /90</th>
+<th id="assists_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Assists /90</th>
+<th id="goals_assists_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">G+A /90</th>
+<th id="shots_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Shots /90</th>
+<th id="tackles_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Tackles /90</th>
+<th id="interceptions_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Interceptions /90</th>
+<th id="fouls_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Fouls /90</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="archetype">Attacking Midfielders</td>
+<td class="gt_row gt_right" headers="goals_per90">0.32</td>
+<td class="gt_row gt_right" headers="assists_per90">0.18</td>
+<td class="gt_row gt_right" headers="goals_assists_per90">0.51</td>
+<td class="gt_row gt_right" headers="shots_per90">2.49</td>
+<td class="gt_row gt_right" headers="tackles_per90">0.64</td>
+<td class="gt_row gt_right" headers="interceptions_per90">0.47</td>
+<td class="gt_row gt_right" headers="fouls_per90">0.94</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="archetype">Box-to-Box Midfielders</td>
+<td class="gt_row gt_right" headers="goals_per90">0.07</td>
+<td class="gt_row gt_right" headers="assists_per90">0.06</td>
+<td class="gt_row gt_right" headers="goals_assists_per90">0.13</td>
+<td class="gt_row gt_right" headers="shots_per90">0.93</td>
+<td class="gt_row gt_right" headers="tackles_per90">1.70</td>
+<td class="gt_row gt_right" headers="interceptions_per90">1.14</td>
+<td class="gt_row gt_right" headers="fouls_per90">1.46</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="archetype">Defensive Midfielders</td>
+<td class="gt_row gt_right" headers="goals_per90">0.04</td>
+<td class="gt_row gt_right" headers="assists_per90">0.08</td>
+<td class="gt_row gt_right" headers="goals_assists_per90">0.12</td>
+<td class="gt_row gt_right" headers="shots_per90">0.77</td>
+<td class="gt_row gt_right" headers="tackles_per90">1.00</td>
+<td class="gt_row gt_right" headers="interceptions_per90">0.97</td>
+<td class="gt_row gt_right" headers="fouls_per90">0.87</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="archetype">Holding Midfielders</td>
+<td class="gt_row gt_right" headers="goals_per90">0.16</td>
+<td class="gt_row gt_right" headers="assists_per90">0.14</td>
+<td class="gt_row gt_right" headers="goals_assists_per90">0.30</td>
+<td class="gt_row gt_right" headers="shots_per90">1.63</td>
+<td class="gt_row gt_right" headers="tackles_per90">0.95</td>
+<td class="gt_row gt_right" headers="interceptions_per90">0.52</td>
+<td class="gt_row gt_right" headers="fouls_per90">1.21</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="interpreting-midfielder-archetypes" class="level2">
+<h2 class="anchored" data-anchor-id="interpreting-midfielder-archetypes">Interpreting Midfielder Archetypes</h2>
+<p>The clustering analysis reveals several broad midfielder archetypes within the Premier League dataset.</p>
+<p>While overlap naturally exists between modern midfield roles, the clusters broadly reflect differences in:</p>
+<p>Offensive production</p>
+<p>Defensive involvement</p>
+<p>Shot activity</p>
+<p>Transitional contribution</p>
+<p>Overall balance of responsibilities</p>
+<p>The identified archetypes include:</p>
+<p>Defensive Midfielders</p>
+<p>Box-to-Box Midfielders</p>
+<p>Attacking Midfielders</p>
+<p>Holding Midfielders</p>
+<p>Importantly, the clustering process identifies statistical behavior patterns rather than traditional football position labels.</p>
+<p>As a result, some players may appear in archetypes that differ slightly from their conventional tactical reputation. This reflects the evolving nature of modern football roles, where midfielders are increasingly expected to contribute across multiple phases of play.</p>
+<p>For example, players traditionally viewed as defensive midfielders may still appear in more progressive or attack-oriented clusters due to increased involvement in transitions, shooting activity, or forward progression responsibilities.</p>
+</section>
+<section id="midfielder-similarity-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="midfielder-similarity-analysis">Midfielder Similarity Analysis</h2>
+<p>While clustering analysis helps identify broad midfielder archetypes, similarity analysis allows for more direct player-to-player comparison.</p>
+<p>Using statistical distance across selected per-90 metrics, the analysis identifies midfielders who demonstrate similar performance profiles within the Premier League.</p>
+<p>This type of analysis is commonly used in football scouting and recruitment environments to:</p>
+<ul>
+<li><p>Identify stylistically similar players</p></li>
+<li><p>Explore potential recruitment alternatives</p></li>
+<li><p>Compare tactical fit across squads</p></li>
+<li><p>Support data-assisted scouting decisions</p></li>
+</ul>
+<p>However, statistical similarity should not be interpreted as identical player quality or tactical role.</p>
+<p>Football context, tactical systems, coaching responsibilities, and team structure all remain important factors when evaluating player fit.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>player_names <span class="ot">&lt;-</span> midfielder_profiles<span class="sc">$</span>player</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>distance_matrix <span class="ot">&lt;-</span> <span class="fu">dist</span>(midfielder_scaled)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>distance_matrix <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(distance_matrix)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(distance_matrix) <span class="ot">&lt;-</span> player_names</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(distance_matrix) <span class="ot">&lt;-</span> player_names</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>find_similar_players <span class="ot">&lt;-</span> <span class="cf">function</span>(player_name, <span class="at">top_n =</span> <span class="dv">5</span>) {</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  similarities <span class="ot">&lt;-</span> <span class="fu">sort</span>(distance_matrix[player_name, ])</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  similarities <span class="ot">&lt;-</span> similarities[<span class="dv">2</span><span class="sc">:</span>(top_n <span class="sc">+</span> <span class="dv">1</span>)]</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">similar_player =</span> <span class="fu">names</span>(similarities),</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">distance =</span> similarities</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#sort(unique(midfielder_profiles$player))[1:50]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">find_similar_players</span>(<span class="st">"Declan Rice"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 2
+  similar_player     distance
+  &lt;chr&gt;                 &lt;dbl&gt;
+1 Idrissa Gana Gueye    0.948
+2 Curtis Jones          1.20 
+3 Archie Gray           1.28 
+4 Malo Gusto            1.35 
+5 Mathias Jensen        1.36 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">find_similar_players</span>(<span class="st">"Bruno Fernandes"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 2
+  similar_player   distance
+  &lt;chr&gt;               &lt;dbl&gt;
+1 Rayan Cherki         1.15
+2 Jarrod Bowen         2.23
+3 Leandro Trossard     2.35
+4 Mohamed Salah        2.59
+5 Harry Wilson         2.73</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="archetype-based-midfielder-profiles" class="level1">
+<h1>Archetype-Based Midfielder Profiles</h1>
+<p>To better understand the stylistic differences between clusters, representative midfielder profiles from each archetype are examined below.</p>
+<p>These examples help connect the statistical clustering output to recognizable football roles and tactical interpretations.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>midfielder_profiles <span class="sc">%&gt;%</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(archetype <span class="sc">==</span> <span class="st">"Box-to-Box Midfielders"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(g_a_per90)) <span class="sc">%&gt;%</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    player,</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    squad,</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    g_a_per90,</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    tkl_per90,</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    int_per90</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"High-Performing Box-to-Box Midfielders"</span></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">player =</span> <span class="st">"Player"</span>,</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">squad =</span> <span class="st">"Club"</span>,</span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">g_a_per90 =</span> <span class="st">"Goals + Assists /90"</span>,</span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">tkl_per90 =</span> <span class="st">"Tackles Won /90"</span>,</span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">int_per90 =</span> <span class="st">"Interceptions /90"</span></span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="chnsoxqwkg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#chnsoxqwkg table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#chnsoxqwkg thead, #chnsoxqwkg tbody, #chnsoxqwkg tfoot, #chnsoxqwkg tr, #chnsoxqwkg td, #chnsoxqwkg th {
+  border-style: none;
+}
+
+#chnsoxqwkg p {
+  margin: 0;
+  padding: 0;
+}
+
+#chnsoxqwkg .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#chnsoxqwkg .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#chnsoxqwkg .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#chnsoxqwkg .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#chnsoxqwkg .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#chnsoxqwkg .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#chnsoxqwkg .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#chnsoxqwkg .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#chnsoxqwkg .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#chnsoxqwkg .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#chnsoxqwkg .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#chnsoxqwkg .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#chnsoxqwkg .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#chnsoxqwkg .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#chnsoxqwkg .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#chnsoxqwkg .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#chnsoxqwkg .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#chnsoxqwkg .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#chnsoxqwkg .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#chnsoxqwkg .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#chnsoxqwkg .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#chnsoxqwkg .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#chnsoxqwkg .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#chnsoxqwkg .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#chnsoxqwkg .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#chnsoxqwkg .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#chnsoxqwkg .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#chnsoxqwkg .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#chnsoxqwkg .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#chnsoxqwkg .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#chnsoxqwkg .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#chnsoxqwkg .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#chnsoxqwkg .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#chnsoxqwkg .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#chnsoxqwkg .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#chnsoxqwkg .gt_left {
+  text-align: left;
+}
+
+#chnsoxqwkg .gt_center {
+  text-align: center;
+}
+
+#chnsoxqwkg .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#chnsoxqwkg .gt_font_normal {
+  font-weight: normal;
+}
+
+#chnsoxqwkg .gt_font_bold {
+  font-weight: bold;
+}
+
+#chnsoxqwkg .gt_font_italic {
+  font-style: italic;
+}
+
+#chnsoxqwkg .gt_super {
+  font-size: 65%;
+}
+
+#chnsoxqwkg .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#chnsoxqwkg .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#chnsoxqwkg .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#chnsoxqwkg .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#chnsoxqwkg .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#chnsoxqwkg .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#chnsoxqwkg .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#chnsoxqwkg .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#chnsoxqwkg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="5" class="gt_heading gt_title gt_font_normal gt_bottom_border">High-Performing Box-to-Box Midfielders</td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="player" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Player</th>
+<th id="squad" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Club</th>
+<th id="g_a_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Goals + Assists /90</th>
+<th id="tkl_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Tackles Won /90</th>
+<th id="int_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Interceptions /90</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Sean Longstaff</td>
+<td class="gt_row gt_left" headers="squad">Leeds United</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.3571429</td>
+<td class="gt_row gt_right" headers="tkl_per90">2.142857</td>
+<td class="gt_row gt_right" headers="int_per90">1.0714286</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">João Palhinha</td>
+<td class="gt_row gt_left" headers="squad">Tottenham Hotspur</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.2868852</td>
+<td class="gt_row gt_right" headers="tkl_per90">2.334160</td>
+<td class="gt_row gt_right" headers="int_per90">1.1475410</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Reece James</td>
+<td class="gt_row gt_left" headers="squad">Chelsea</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.2752294</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.513761</td>
+<td class="gt_row gt_right" headers="int_per90">1.4678899</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Daniel Muñoz</td>
+<td class="gt_row gt_left" headers="squad">Crystal Palace</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.2621723</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.797753</td>
+<td class="gt_row gt_right" headers="int_per90">0.8988764</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Diego Gómez</td>
+<td class="gt_row gt_left" headers="squad">Brighton</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.2542373</td>
+<td class="gt_row gt_right" headers="tkl_per90">2.076271</td>
+<td class="gt_row gt_right" headers="int_per90">0.8050847</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">James Garner</td>
+<td class="gt_row gt_left" headers="squad">Everton</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.2374670</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.899736</td>
+<td class="gt_row gt_right" headers="int_per90">1.5039578</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Elliot Anderson</td>
+<td class="gt_row gt_left" headers="squad">Nottingham Forest</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.2162162</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.621622</td>
+<td class="gt_row gt_right" headers="int_per90">1.1081081</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Mateus Fernandes</td>
+<td class="gt_row gt_left" headers="squad">West Ham United</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.2089552</td>
+<td class="gt_row gt_right" headers="tkl_per90">2.000000</td>
+<td class="gt_row gt_right" headers="int_per90">1.0746269</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Tyler Adams</td>
+<td class="gt_row gt_left" headers="squad">Bournemouth</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.2030457</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.218274</td>
+<td class="gt_row gt_right" headers="int_per90">1.5228426</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Ryan Sessegnon</td>
+<td class="gt_row gt_left" headers="squad">Fulham</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.1970443</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.428571</td>
+<td class="gt_row gt_right" headers="int_per90">1.1330049</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>midfielder_profiles <span class="sc">%&gt;%</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(archetype <span class="sc">==</span> <span class="st">"Attacking Midfielders"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(g_a_per90)) <span class="sc">%&gt;%</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    player,</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    squad,</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    g_a_per90,</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    sh_per90,</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    ast_per90</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Top Attacking Midfield Profiles"</span></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="owzfngjefp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#owzfngjefp table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#owzfngjefp thead, #owzfngjefp tbody, #owzfngjefp tfoot, #owzfngjefp tr, #owzfngjefp td, #owzfngjefp th {
+  border-style: none;
+}
+
+#owzfngjefp p {
+  margin: 0;
+  padding: 0;
+}
+
+#owzfngjefp .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#owzfngjefp .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#owzfngjefp .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#owzfngjefp .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#owzfngjefp .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#owzfngjefp .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#owzfngjefp .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#owzfngjefp .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#owzfngjefp .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#owzfngjefp .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#owzfngjefp .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#owzfngjefp .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#owzfngjefp .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#owzfngjefp .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#owzfngjefp .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#owzfngjefp .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#owzfngjefp .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#owzfngjefp .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#owzfngjefp .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#owzfngjefp .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#owzfngjefp .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#owzfngjefp .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#owzfngjefp .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#owzfngjefp .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#owzfngjefp .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#owzfngjefp .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#owzfngjefp .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#owzfngjefp .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#owzfngjefp .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#owzfngjefp .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#owzfngjefp .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#owzfngjefp .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#owzfngjefp .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#owzfngjefp .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#owzfngjefp .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#owzfngjefp .gt_left {
+  text-align: left;
+}
+
+#owzfngjefp .gt_center {
+  text-align: center;
+}
+
+#owzfngjefp .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#owzfngjefp .gt_font_normal {
+  font-weight: normal;
+}
+
+#owzfngjefp .gt_font_bold {
+  font-weight: bold;
+}
+
+#owzfngjefp .gt_font_italic {
+  font-style: italic;
+}
+
+#owzfngjefp .gt_super {
+  font-size: 65%;
+}
+
+#owzfngjefp .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#owzfngjefp .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#owzfngjefp .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#owzfngjefp .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#owzfngjefp .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#owzfngjefp .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#owzfngjefp .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#owzfngjefp .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#owzfngjefp div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="5" class="gt_heading gt_title gt_font_normal gt_bottom_border">Top Attacking Midfield Profiles</td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="player" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">player</th>
+<th id="squad" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">squad</th>
+<th id="g_a_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">g_a_per90</th>
+<th id="sh_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">sh_per90</th>
+<th id="ast_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">ast_per90</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Rayan Cherki</td>
+<td class="gt_row gt_left" headers="squad">Manchester City</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.7218475</td>
+<td class="gt_row gt_right" headers="sh_per90">2.777778</td>
+<td class="gt_row gt_right" headers="ast_per90">0.4391148</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Bruno Fernandes</td>
+<td class="gt_row gt_left" headers="squad">Manchester Utd</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.7218475</td>
+<td class="gt_row gt_right" headers="sh_per90">2.500000</td>
+<td class="gt_row gt_right" headers="ast_per90">0.4391148</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Eli Junior Kroupi</td>
+<td class="gt_row gt_left" headers="squad">Bournemouth</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.6989247</td>
+<td class="gt_row gt_right" headers="sh_per90">2.795699</td>
+<td class="gt_row gt_right" headers="ast_per90">0.0000000</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Richarlison</td>
+<td class="gt_row gt_left" headers="squad">Tottenham Hotspur</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.6880734</td>
+<td class="gt_row gt_right" headers="sh_per90">2.798165</td>
+<td class="gt_row gt_right" headers="ast_per90">0.1834862</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">João Pedro</td>
+<td class="gt_row gt_left" headers="squad">Chelsea</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.6756757</td>
+<td class="gt_row gt_right" headers="sh_per90">2.466216</td>
+<td class="gt_row gt_right" headers="ast_per90">0.1689189</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Mikel Merino</td>
+<td class="gt_row gt_left" headers="squad">Arsenal</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.6086957</td>
+<td class="gt_row gt_right" headers="sh_per90">1.913043</td>
+<td class="gt_row gt_right" headers="ast_per90">0.2608696</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Mohamed Salah</td>
+<td class="gt_row gt_left" headers="squad">Liverpool</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.5882353</td>
+<td class="gt_row gt_right" headers="sh_per90">2.857143</td>
+<td class="gt_row gt_right" headers="ast_per90">0.2941176</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Harry Wilson</td>
+<td class="gt_row gt_left" headers="squad">Fulham</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.5723906</td>
+<td class="gt_row gt_right" headers="sh_per90">2.626263</td>
+<td class="gt_row gt_right" headers="ast_per90">0.2356902</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Rayan</td>
+<td class="gt_row gt_left" headers="squad">Bournemouth</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.5691057</td>
+<td class="gt_row gt_right" headers="sh_per90">2.276423</td>
+<td class="gt_row gt_right" headers="ast_per90">0.1626016</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Morgan Gibbs-White</td>
+<td class="gt_row gt_left" headers="squad">Nottingham Forest</td>
+<td class="gt_row gt_right" headers="g_a_per90">0.5523256</td>
+<td class="gt_row gt_right" headers="sh_per90">2.412791</td>
+<td class="gt_row gt_right" headers="ast_per90">0.1162791</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>midfielder_profiles <span class="sc">%&gt;%</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(archetype <span class="sc">==</span> <span class="st">"Holding Midfielders"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(tkl_per90)) <span class="sc">%&gt;%</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    player,</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    squad,</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>    tkl_per90,</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>    int_per90,</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    fls_per90</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Top Holding Midfield Profiles"</span></span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="xuwkdlnsyg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#xuwkdlnsyg table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#xuwkdlnsyg thead, #xuwkdlnsyg tbody, #xuwkdlnsyg tfoot, #xuwkdlnsyg tr, #xuwkdlnsyg td, #xuwkdlnsyg th {
+  border-style: none;
+}
+
+#xuwkdlnsyg p {
+  margin: 0;
+  padding: 0;
+}
+
+#xuwkdlnsyg .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#xuwkdlnsyg .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#xuwkdlnsyg .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#xuwkdlnsyg .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#xuwkdlnsyg .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#xuwkdlnsyg .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#xuwkdlnsyg .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#xuwkdlnsyg .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#xuwkdlnsyg .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#xuwkdlnsyg .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#xuwkdlnsyg .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#xuwkdlnsyg .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#xuwkdlnsyg .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#xuwkdlnsyg .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#xuwkdlnsyg .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#xuwkdlnsyg .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#xuwkdlnsyg .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#xuwkdlnsyg .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#xuwkdlnsyg .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xuwkdlnsyg .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#xuwkdlnsyg .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#xuwkdlnsyg .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#xuwkdlnsyg .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xuwkdlnsyg .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#xuwkdlnsyg .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#xuwkdlnsyg .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#xuwkdlnsyg .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xuwkdlnsyg .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#xuwkdlnsyg .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#xuwkdlnsyg .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#xuwkdlnsyg .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#xuwkdlnsyg .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#xuwkdlnsyg .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xuwkdlnsyg .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#xuwkdlnsyg .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xuwkdlnsyg .gt_left {
+  text-align: left;
+}
+
+#xuwkdlnsyg .gt_center {
+  text-align: center;
+}
+
+#xuwkdlnsyg .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#xuwkdlnsyg .gt_font_normal {
+  font-weight: normal;
+}
+
+#xuwkdlnsyg .gt_font_bold {
+  font-weight: bold;
+}
+
+#xuwkdlnsyg .gt_font_italic {
+  font-style: italic;
+}
+
+#xuwkdlnsyg .gt_super {
+  font-size: 65%;
+}
+
+#xuwkdlnsyg .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#xuwkdlnsyg .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#xuwkdlnsyg .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#xuwkdlnsyg .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#xuwkdlnsyg .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#xuwkdlnsyg .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#xuwkdlnsyg .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#xuwkdlnsyg .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#xuwkdlnsyg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="5" class="gt_heading gt_title gt_font_normal gt_bottom_border">Top Holding Midfield Profiles</td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="player" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">player</th>
+<th id="squad" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">squad</th>
+<th id="tkl_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">tkl_per90</th>
+<th id="int_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">int_per90</th>
+<th id="fls_per90" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">fls_per90</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Patrick Dorgu</td>
+<td class="gt_row gt_left" headers="squad">Manchester Utd</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.863354</td>
+<td class="gt_row gt_right" headers="int_per90">0.9937888</td>
+<td class="gt_row gt_right" headers="fls_per90">1.4285714</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Enzo Le Fée</td>
+<td class="gt_row gt_left" headers="squad">Sunderland</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.717791</td>
+<td class="gt_row gt_right" headers="int_per90">0.8588957</td>
+<td class="gt_row gt_right" headers="fls_per90">0.9509202</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Rodrigo Gomes</td>
+<td class="gt_row gt_left" headers="squad">Wolves</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.682243</td>
+<td class="gt_row gt_right" headers="int_per90">1.0280374</td>
+<td class="gt_row gt_right" headers="fls_per90">0.5607477</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Casemiro</td>
+<td class="gt_row gt_left" headers="squad">Manchester Utd</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.573427</td>
+<td class="gt_row gt_right" headers="int_per90">1.0489510</td>
+<td class="gt_row gt_right" headers="fls_per90">1.6083916</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Bruno Guimarães</td>
+<td class="gt_row gt_left" headers="squad">Newcastle United</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.501832</td>
+<td class="gt_row gt_right" headers="int_per90">0.5860806</td>
+<td class="gt_row gt_right" headers="fls_per90">1.6483516</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Mikkel Damsgaard</td>
+<td class="gt_row gt_left" headers="squad">Brentford</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.491228</td>
+<td class="gt_row gt_right" headers="int_per90">1.0526316</td>
+<td class="gt_row gt_right" headers="fls_per90">0.7894737</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Amine Adli</td>
+<td class="gt_row gt_left" headers="squad">Bournemouth</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.404959</td>
+<td class="gt_row gt_right" headers="int_per90">0.4958678</td>
+<td class="gt_row gt_right" headers="fls_per90">2.2752684</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Yankuba Minteh</td>
+<td class="gt_row gt_left" headers="squad">Brighton</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.390977</td>
+<td class="gt_row gt_right" headers="int_per90">0.5639098</td>
+<td class="gt_row gt_right" headers="fls_per90">1.2030075</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="player">Emi Buendía</td>
+<td class="gt_row gt_left" headers="squad">Aston Villa</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.384615</td>
+<td class="gt_row gt_right" headers="int_per90">0.6666667</td>
+<td class="gt_row gt_right" headers="fls_per90">2.1025641</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="player">Joe Willock</td>
+<td class="gt_row gt_left" headers="squad">Newcastle United</td>
+<td class="gt_row gt_right" headers="tkl_per90">1.376147</td>
+<td class="gt_row gt_right" headers="int_per90">0.6422018</td>
+<td class="gt_row gt_right" headers="fls_per90">1.4678899</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>This project explored how statistical analysis and unsupervised learning techniques can be used to profile modern Premier League midfielders using football performance data derived from FBref.</p>
+<p>Through exploratory analysis, per-90 normalization, clustering, and similarity modeling, the project identified several broad midfielder archetypes associated with different tactical and stylistic responsibilities.</p>
+<p>The analysis demonstrated how:</p>
+<ul>
+<li><p>Per-90 normalization</p></li>
+<li><p>Playing-time thresholds</p></li>
+<li><p>Clustering methods</p></li>
+<li><p>Statistical similarity models</p></li>
+<li><p>Football-specific interpretation</p></li>
+</ul>
+<p>can support player profiling and football scouting workflows.</p>
+<p>The project also highlighted the complexity of modern midfield roles. Many players demonstrated overlapping statistical profiles, reflecting the increasing tactical demands placed on midfielders in transition-heavy modern football.</p>
+<p>Importantly, the results showed that statistical clustering captures behavioral performance patterns rather than traditional positional labels alone.</p>
+<p>While football analytics can provide valuable insights, football performance cannot be fully explained through statistics alone. Tactical context, coaching systems, player responsibilities, and team structure remain essential when interpreting analytical output.</p>
+<p>Overall, this project demonstrates how data analysis techniques can support more structured and evidence-based football evaluation while still requiring football-specific contextual understanding.</p>
+</section>
+<section id="limitations-and-future-improvements" class="level1">
+<h1>Limitations and Future Improvements</h1>
+<p>Although the dataset provides a broad range of football statistics, several limitations remain within the analysis.</p>
+<p>The dataset does not include:</p>
+<ul>
+<li><p>Detailed event-level data</p></li>
+<li><p>Progressive carrying metrics</p></li>
+<li><p>Pressure-related statistics</p></li>
+<li><p>Spatial tracking data</p></li>
+<li><p>Tactical positioning information</p></li>
+</ul>
+<p>Future improvements could include:</p>
+<ul>
+<li><p>Event-level football data</p></li>
+<li><p>More advanced passing progression metrics</p></li>
+<li><p>Expected possession value models</p></li>
+<li><p>Tracking-based tactical analysis</p></li>
+<li><p>Role-specific positional modeling</p></li>
+</ul>
+<p>Additionally, football context such as tactical systems, coaching structure, and teammate quality remains difficult to fully capture statistically.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

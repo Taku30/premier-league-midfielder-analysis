@@ -1,0 +1,992 @@
+---
+title: "Identifying Midfielder Archetypes in the Premier League Using Football Performance Data"
+
+author: "Taku Takahashi"
+
+format: html
+
+editor: visual
+
+execute:
+  warning: false
+  message: false
+  echo: true
+---
+
+# Introduction
+
+Modern football has evolved significantly over the past decade, particularly in midfield roles. Midfielders are no longer evaluated solely based on technical quality such as passing range or creativity. In today's game, midfielders are increasingly expected to contribute across multiple phases of play, including defensive transitions, pressing intensity, positional awareness, and physical output.
+
+The modern game has become faster, more transition-oriented, and more physically demanding. As a result, elite midfielders are often required to combine technical ability with defensive contribution, tactical discipline, and athletic intensity. Players who can contribute both offensively and defensively have become increasingly valuable in modern football systems.
+
+Because of these tactical developments, football clubs and analysts increasingly rely on performance data and statistical profiling to support scouting and recruitment decisions.
+
+This project explores how football statistics can be used to analyze and profile modern midfielders in the Premier League. The analysis focuses on identifying different midfielder characteristics and stylistic profiles using player performance data derived from FBref statistics.
+
+Rather than focusing only on traditional attacking statistics, this project emphasizes broader midfielder responsibilities such as:
+
+- Defensive contribution
+- Creative involvement
+- Possession retention and involvement
+- Transitional contribution
+- Overall midfield balance
+
+The project combines football understanding with data analysis techniques in order to better understand what statistically defines modern Premier League midfielders.
+
+# Project Objectives
+
+The main objectives of this project are to:
+
+-   Analyze statistical characteristics of Premier League midfielders
+-   Explore how modern midfielder roles differ across playing styles
+-   Identify different midfielder archetypes using performance metrics
+-   Compare players based on stylistic similarities
+-   Investigate undervalued or less recognized midfielder profiles
+
+The project also aims to demonstrate how football analytics can support scouting and player evaluation in modern football environments.
+
+# Scope of Analysis
+
+Although the original dataset contains player statistics from Europe’s top five leagues, this project focuses specifically on Premier League midfielders.
+
+The Premier League was selected because of:
+
+-   Its high physical intensity
+-   Tactical competitiveness
+-   Transition-heavy style of play
+-   Strong global relevance in modern football analysis
+
+Restricting the analysis to a single league also helps maintain a more consistent tactical and statistical environment when comparing midfielder profiles.
+
+# Data Source
+
+The dataset used in this project contains player performance statistics from the completed 2025–2026 football season and is derived from FBref data.
+
+FBref is one of the most widely recognized football statistics platforms used in football analytics and scouting communities. The platform provides detailed player and team statistics sourced from Opta, including:
+
+-   Goal contribution metrics
+-   Shooting statistics
+-   Defensive actions
+-   Match participation metrics
+-   Discipline statistics
+-   General player performance indicators
+
+The dataset contains over 100 statistical variables related to player performance across multiple competitions and leagues.
+
+For this project, the dataset is filtered specifically for Premier League midfielders in order to focus the analysis on modern midfield roles within a more consistent football environment.
+
+# Important Considerations
+
+Football performance cannot be fully explained through statistics alone. Many important aspects of football remain difficult to quantify, including:
+
+-   Tactical intelligence
+-   Communication
+-   Leadership
+-   Off-ball movement
+-   Team tactical structure
+-   Decision-making under pressure
+
+Therefore, this project should be viewed as a data-assisted football profiling and scouting exercise rather than a complete measure of player quality.
+
+Additionally, player statistics can be influenced by:
+
+-   Team tactics
+-   Coaching systems
+-   Teammate quality
+-   Match context
+-   Playing time and role consistency
+
+For this reason, football context remains essential when interpreting statistical output.
+
+# Tools and Technologies
+
+This project uses:
+
+R
+
+Quarto
+
+tidyverse
+
+ggplot2
+
+factoextra
+
+cluster
+
+gt
+
+The workflow includes:
+
+Data cleaning and preprocessing
+
+Exploratory data analysis
+
+Midfielder-focused feature selection
+
+Per-90 normalization and outlier handling
+
+Clustering and archetype identification
+
+Statistical player similarity analysis
+
+Football-specific interpretation of analytical results
+
+------------------------------------------------------------------------
+
+# Data Loading and Initial Preparation
+
+Before beginning the analysis, the dataset is loaded and inspected in order to understand:
+
+-   Dataset structure
+-   Available variables
+-   Position labels
+-   League information
+-   Potential cleaning requirements
+
+The initial preparation stage also standardizes column names and prepares the dataset for midfielder-focused analysis.
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(janitor)
+library(cluster)
+library(factoextra)
+library(gt)
+library(viridis)
+library(scales)
+```
+
+## Load Dataset
+
+```{r}
+df <- read_csv("../data/players_data-2025_2026.csv")
+```
+
+# Data Cleaning and Preprocessing
+
+Before beginning exploratory analysis, the dataset is cleaned and filtered in order to create a more consistent analytical sample focused on Premier League midfielders.
+
+This stage includes:
+
+-   Standardizing column names
+-   Filtering midfielder positions
+-   Removing duplicated player entries caused by mid-season transfers
+-   Restricting the dataset to Premier League players
+-   Preparing the dataset for exploratory analysis and player profiling
+
+```{r}
+df <- df %>%
+  clean_names()
+```
+
+```{r}
+#names(df)
+```
+
+## Midfielder Filtering
+
+Modern football positions are increasingly fluid and role-based rather than strictly positional.
+
+For this reason, the analysis includes players whose position labels contain midfield roles, including hybrid positions such as:
+
+-   MF
+-   DF,MF
+-   MF,FW
+-   FW,MF
+
+This approach better reflects the tactical flexibility of modern midfield roles in modern football.
+
+```{r}
+midfielders <- df %>%
+  filter(str_detect(pos, "MF"))
+```
+
+## Handling Mid-Season Transfers
+
+Players who represented multiple clubs during the season were excluded from the analysis.
+
+Because player performance is strongly influenced by tactical environment, teammate quality, and coaching systems, only players who remained within a single club environment were retained for analysis.
+
+```{r}
+midfielders_clean <- midfielders %>%
+  add_count(player) %>%
+  filter(n == 1) %>%
+  select(-n)
+```
+
+## 
+
+**Filter Premier League Midfielders**
+
+```{r}
+prem_midfielders <- midfielders_clean %>%
+  filter(comp == "eng Premier League")
+```
+
+```{r}
+dim(prem_midfielders)
+```
+
+```{r}
+table(prem_midfielders$pos)
+```
+
+## Final Positional Distribution
+
+The final analytical dataset includes both traditional and hybrid midfield roles.
+
+This reflects the increasing tactical fluidity of modern football, where midfield responsibilities are often shared across multiple positional structures.
+
+The dataset includes:
+
+-   Central midfielders
+
+-   Defensive-midfield hybrids
+
+-   Advanced attacking midfielders
+
+-   Wide midfield hybrids
+
+This approach allows the analysis to better capture the diversity of modern Premier League midfield roles.
+
+------------------------------------------------------------------------
+
+# Exploratory Data Analysis (EDA)
+
+The exploratory analysis focuses on understanding the statistical characteristics and role diversity of modern Premier League midfielders.
+
+Rather than performing broad generic exploration, the EDA is designed to investigate football-specific questions related to:
+
+-   Midfielder age profiles
+
+-   Positional flexibility
+
+-   Playing time distribution
+
+-   Offensive contribution
+
+-   Defensive involvement
+
+-   Balance between creativity and defensive work
+
+The purpose of this section is to better understand the structure of the dataset before building midfielder archetypes and similarity models.
+
+```{r}
+football_theme <- function() {
+  theme_minimal() +
+    theme(
+      plot.title = element_text(
+        size = 18,
+        face = "bold",
+        hjust = 0.5
+      ),
+
+      plot.subtitle = element_text(
+        size = 11,
+        hjust = 0.5,
+        color = "gray40"
+      ),
+
+      axis.title = element_text(
+        size = 12,
+        face = "bold"
+      ),
+
+      axis.text = element_text(
+        size = 10
+      ),
+
+      panel.grid.minor = element_blank(),
+
+      panel.grid.major = element_line(
+        color = "gray90"
+      )
+    )
+}
+```
+
+## Age Distribution of Midfielders
+
+Modern midfield roles require a balance between physical intensity, tactical understanding, and technical consistency.
+
+Analyzing the age distribution of Premier League midfielders may help reveal the age ranges most commonly associated with regular midfield involvement in the modern game.
+
+```{r}
+ggplot(prem_midfielders, aes(x = age)) +
+
+  geom_histogram(
+    binwidth = 1,
+    fill = "#1b4332",
+    color = "white",
+    alpha = 0.9
+  ) +
+
+  labs(
+    title = "Age Distribution of Premier League Midfielders",
+    subtitle = "Distribution of midfielder ages within the analytical dataset",
+    x = "Age",
+    y = "Number of Players"
+  ) +
+
+  football_theme()
+```
+
+## Positional Flexibility
+
+Modern football increasingly relies on hybrid positional roles rather than rigid positional structures.
+
+This visualization shows the distribution of positional labels among Premier League midfielders included in the dataset.
+
+```{r}
+prem_midfielders %>%
+
+  count(pos) %>%
+
+  ggplot(aes(x = reorder(pos, n), y = n, fill = pos)) +
+
+  geom_col(show.legend = FALSE) +
+
+  labs(
+    title = "Positional Distribution of Midfielders",
+    subtitle = "Hybrid midfield roles are increasingly common in modern football",
+    x = "Position",
+    y = "Number of Players"
+  ) +
+
+  scale_fill_brewer(palette = "Greens") +
+
+  football_theme()
+```
+
+## Playing Time Distribution
+
+Playing time is an important consideration in football analytics because statistical reliability is strongly influenced by sample size.
+
+This visualization shows the distribution of minutes played among Premier League midfielders included in the analysis.
+
+```{r}
+ggplot(prem_midfielders, aes(x = min)) +
+
+  geom_histogram(
+    binwidth = 250,
+    fill = "#1d3557",
+    color = "white",
+    alpha = 0.9
+  ) +
+
+  labs(
+    title = "Minutes Played Distribution",
+    subtitle = "Distribution of playing time among Premier League midfielders",
+    x = "Minutes Played",
+    y = "Number of Players"
+  ) +
+
+  football_theme()
+```
+
+## Defensive Contribution vs Offensive Output
+
+One of the defining characteristics of modern midfielders is the increasing expectation to contribute in multiple phases of play.
+
+This visualization explores the relationship between defensive contribution and offensive production among Premier League midfielders.
+
+```{r}
+ggplot(
+  prem_midfielders,
+  aes(
+    x = tkl_w,
+    y = g_a
+  )
+) +
+
+  geom_point(
+    color = "#2a9d8f",
+    alpha = 0.75,
+    size = 3
+  ) +
+
+  geom_smooth(
+    method = "lm",
+    se = FALSE,
+    color = "darkred",
+    linewidth = 1
+  ) +
+
+  labs(
+    title = "Defensive Contribution vs Offensive Output",
+    subtitle = "Relationship between tackles won and goal contribution",
+    x = "Tackles Won",
+    y = "Goals + Assists"
+  ) +
+
+  football_theme()
+```
+
+## Top Holding Midfielders
+
+Defensive contribution remains one of the most important responsibilities in modern midfield play, particularly in transition-heavy leagues such as the Premier League.
+
+The table below highlights midfielders with the strongest tackle-winning output.
+
+```{r}
+prem_midfielders %>%
+  select(player, squad, tkl_w, int, g_a) %>%
+  arrange(desc(tkl_w)) %>%
+  slice_head(n = 10) %>%
+  gt() %>%
+  tab_header(
+    title = "Top Holding Midfielders"
+  ) %>%
+  cols_label(
+    player = "Player",
+    squad = "Club",
+    tkl_w = "Tackles Won",
+    int = "Interceptions",
+    g_a = "Goals + Assists"
+  ) %>%
+  data_color(
+    columns = c(tkl_w, int),
+    colors = scales::col_numeric(
+      palette = c("white", "darkgreen"),
+      domain = NULL
+    )
+  )
+```
+
+## Offensive and Creative Contribution
+
+While modern midfielders are increasingly expected to contribute defensively, offensive production and creativity remain highly valuable aspects of midfield performance.
+
+```{r}
+prem_midfielders %>%
+  arrange(desc(g_a)) %>%
+  slice_head(n = 15) %>%
+  ggplot(aes(
+    x = reorder(player, g_a),
+    y = g_a
+  )) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Top Midfielders by Goals + Assists",
+    x = "Player",
+    y = "Goals + Assists"
+  ) +
+  football_theme()
+```
+
+---
+
+# Midfielder Profiling Framework
+
+After exploring the overall structure of the dataset, the next stage focuses on defining statistical dimensions that represent different aspects of modern midfield performance.
+
+Rather than evaluating midfielders using only traditional attacking statistics, this framework attempts to capture broader midfield responsibilities in the modern Premier League.
+
+The profiling framework focuses on:
+
+-   Offensive contribution
+
+-   Defensive involvement
+
+-   Playing time and match participation
+
+-   Statistical balance across multiple phases of play
+
+These dimensions will later be used for midfielder archetype analysis and player similarity modeling.
+
+## Statistical Dimensions of Midfielder Performance
+
+In modern football, midfielders are expected to contribute across multiple phases of play rather than specializing in only a single role.
+
+To better capture different midfielder profiles, the analysis groups performance metrics into several broader statistical dimensions.
+
+### Offensive Contribution
+
+Variables related to attacking production and shot involvement:
+
+-   Goals
+
+-   Assists
+
+-   Goals + Assists
+
+-   Shots
+
+-   Shots on Target
+
+### Defensive Contribution
+
+Variables related to defensive activity and ball recovery:
+
+-   Tackles Won
+
+-   Interceptions
+
+-   Fouls Committed
+
+### Match Involvement
+
+Variables related to playing time and participation:
+
+-   Matches Played
+
+-   Starts
+
+-   Minutes Played
+
+### Discipline and Control
+
+Variables related to player discipline:
+
+-   Yellow Cards
+
+-   Red Cards
+
+These dimensions are later used to explore midfielder archetypes and statistical similarities between players.
+
+# Midfielder Archetype Analysis
+
+Modern midfielders perform a wide variety of tactical and statistical roles within Premier League football.
+
+Some midfielders contribute heavily in defensive phases, while others focus more on attacking output, ball progression, or balanced two-way play.
+
+To better understand these stylistic differences, clustering analysis is used to group midfielders with similar statistical profiles into broader archetypes.
+
+## Per-90 Normalization
+
+Raw cumulative statistics are heavily influenced by playing time and match involvement.
+
+To better compare midfielder playing styles independent of total minutes played, several statistical variables are converted into per-90 metrics.
+
+Per-90 normalization helps estimate contribution rates rather than total accumulation, allowing for more balanced player comparisons during clustering and similarity analysis.
+
+To reduce statistical noise from extremely small sample sizes, players with fewer than 10 full 90-minute equivalents (900 minutes played) were excluded from the clustering and similarity analysis.
+
+This filtering step improves the reliability of per-90 performance metrics and reduces distortion caused by limited playing time.
+
+While per-90 normalization helps standardize player comparisons, minimum playing-time thresholds remain important in football analytics to ensure statistical stability and more meaningful interpretation.
+
+```{r}
+midfielder_profiles <- prem_midfielders %>%
+  select(
+    player,
+    squad,
+    age,
+    pos,
+    x90s,
+    gls,
+    ast,
+    g_a,
+    sh,
+    so_t,
+    tkl_w,
+    int,
+    fls,
+    crd_y,
+    crd_r
+  ) %>%
+  filter(x90s >= 10) %>%
+  mutate(
+    gls_per90 = gls / x90s,
+    ast_per90 = ast / x90s,
+    g_a_per90 = g_a / x90s,
+    sh_per90 = sh / x90s,
+    sot_per90 = so_t / x90s,
+    tkl_per90 = tkl_w / x90s,
+    int_per90 = int / x90s,
+    fls_per90 = fls / x90s
+  )
+```
+
+## Determining the Number of Clusters
+
+Before performing clustering analysis, the Elbow Method is used to estimate an appropriate number of midfielder clusters.
+
+The Elbow Method helps identify the point where adding additional clusters produces diminishing improvements in cluster separation.
+
+```{r}
+midfielder_profiles <- midfielder_profiles %>%
+
+  mutate(
+
+    gls_per90 = pmin(gls_per90, quantile(gls_per90, 0.99)),
+
+    ast_per90 = pmin(ast_per90, quantile(ast_per90, 0.99)),
+
+    g_a_per90 = pmin(g_a_per90, quantile(g_a_per90, 0.99)),
+
+    sh_per90 = pmin(sh_per90, quantile(sh_per90, 0.99)),
+
+    sot_per90 = pmin(sot_per90, quantile(sot_per90, 0.99)),
+
+    tkl_per90 = pmin(tkl_per90, quantile(tkl_per90, 0.99)),
+
+    int_per90 = pmin(int_per90, quantile(int_per90, 0.99)),
+
+    fls_per90 = pmin(fls_per90, quantile(fls_per90, 0.99))
+
+  )
+```
+
+```{r}
+midfielder_scaled <- midfielder_profiles %>%
+  select(
+    gls_per90,
+    ast_per90,
+    g_a_per90,
+    sh_per90,
+    sot_per90,
+    tkl_per90,
+    int_per90,
+    fls_per90
+  ) %>%
+  na.omit() %>%
+  scale()
+```
+
+```{r}
+fviz_nbclust(
+  midfielder_scaled,
+  kmeans,
+  method = "wss"
+) +
+  labs(
+    title = "Elbow Method for Optimal Number of Clusters"
+  ) +
+  football_theme()
+```
+
+## Determining the Number of Clusters
+
+The Elbow Method was used to estimate an appropriate number of midfielder clusters.
+
+Although the elbow pattern is not perfectly distinct after per-90 normalization, four clusters were selected because they provided a reasonable balance between: 
+
+- Statistical separation 
+- Interpretability 
+- Football-specific role distinctions
+
+This reflects the reality that modern midfield roles often overlap stylistically rather than forming perfectly isolated categories.
+
+```{r}
+set.seed(123)
+
+kmeans_result <- kmeans(
+  midfielder_scaled,
+  centers = 4,
+  nstart = 25
+)
+```
+
+## Midfielder Archetype Visualization
+
+The visualization below shows how midfielders are grouped into broader statistical archetypes based on their overall performance profiles.
+
+```{r}
+fviz_cluster(
+  kmeans_result,
+  data = midfielder_scaled,
+  geom = "point",
+  ellipse.type = "norm",
+  palette = c(
+    "#264653",
+    "#2a9d8f",
+    "#e9c46a",
+    "#e76f51"
+  ),
+  ggtheme = theme_minimal()
+) +
+
+  labs(
+    title = "Premier League Midfielder Archetypes",
+    subtitle = "K-Means clustering using standardized per-90 performance metrics"
+  ) +
+
+  football_theme()
+```
+
+## Cluster Profile Comparison
+
+To better understand the characteristics of each midfielder archetype, average statistical values are compared across clusters.
+
+This helps identify the defining traits associated with each statistical midfielder profile.
+
+```{r}
+midfielder_profiles$cluster <- as.factor(kmeans_result$cluster)
+
+midfielder_profiles <- midfielder_profiles %>%
+  mutate(
+    archetype = case_when(
+      cluster == 1 ~ "Defensive Midfielders",
+      cluster == 2 ~ "Box-to-Box Midfielders",
+      cluster == 3 ~ "Attacking Midfielders",
+      cluster == 4 ~ "Holding Midfielders"
+    )
+  )
+```
+
+```{r}
+midfielder_profiles %>%
+
+  group_by(archetype) %>%
+
+  summarise(
+    goals_per90 = mean(gls_per90),
+    assists_per90 = mean(ast_per90),
+    goals_assists_per90 = mean(g_a_per90),
+    shots_per90 = mean(sh_per90),
+    tackles_per90 = mean(tkl_per90),
+    interceptions_per90 = mean(int_per90),
+    fouls_per90 = mean(fls_per90)
+  ) %>%
+
+  gt() %>%
+
+  tab_header(
+    title = "Statistical Comparison of Midfielder Archetypes"
+  ) %>%
+
+  fmt_number(
+    columns = where(is.numeric),
+    decimals = 2
+  ) %>%
+
+  cols_label(
+    archetype = "Archetype",
+    goals_per90 = "Goals /90",
+    assists_per90 = "Assists /90",
+    goals_assists_per90 = "G+A /90",
+    shots_per90 = "Shots /90",
+    tackles_per90 = "Tackles /90",
+    interceptions_per90 = "Interceptions /90",
+    fouls_per90 = "Fouls /90"
+  ) %>%
+
+  tab_options(
+    table.font.size = px(13),
+    heading.title.font.size = px(18),
+    data_row.padding = px(5)
+  )
+```
+
+## Interpreting Midfielder Archetypes
+
+The clustering analysis reveals several broad midfielder archetypes within the Premier League dataset.
+
+While overlap naturally exists between modern midfield roles, the clusters broadly reflect differences in:
+
+Offensive production
+
+Defensive involvement
+
+Shot activity
+
+Transitional contribution
+
+Overall balance of responsibilities
+
+The identified archetypes include:
+
+Defensive Midfielders
+
+Box-to-Box Midfielders
+
+Attacking Midfielders
+
+Holding Midfielders
+
+Importantly, the clustering process identifies statistical behavior patterns rather than traditional football position labels.
+
+As a result, some players may appear in archetypes that differ slightly from their conventional tactical reputation. This reflects the evolving nature of modern football roles, where midfielders are increasingly expected to contribute across multiple phases of play.
+
+For example, players traditionally viewed as defensive midfielders may still appear in more progressive or attack-oriented clusters due to increased involvement in transitions, shooting activity, or forward progression responsibilities.
+
+## Midfielder Similarity Analysis
+
+While clustering analysis helps identify broad midfielder archetypes, similarity analysis allows for more direct player-to-player comparison.
+
+Using statistical distance across selected per-90 metrics, the analysis identifies midfielders who demonstrate similar performance profiles within the Premier League.
+
+This type of analysis is commonly used in football scouting and recruitment environments to:
+
+-   Identify stylistically similar players
+
+-   Explore potential recruitment alternatives
+
+-   Compare tactical fit across squads
+
+-   Support data-assisted scouting decisions
+
+However, statistical similarity should not be interpreted as identical player quality or tactical role.
+
+Football context, tactical systems, coaching responsibilities, and team structure all remain important factors when evaluating player fit.
+
+```{r}
+player_names <- midfielder_profiles$player
+```
+
+```{r}
+distance_matrix <- dist(midfielder_scaled)
+```
+
+```{r}
+distance_matrix <- as.matrix(distance_matrix)
+
+rownames(distance_matrix) <- player_names
+colnames(distance_matrix) <- player_names
+```
+
+```{r}
+find_similar_players <- function(player_name, top_n = 5) {
+
+  similarities <- sort(distance_matrix[player_name, ])
+
+  similarities <- similarities[2:(top_n + 1)]
+
+  tibble(
+    similar_player = names(similarities),
+    distance = similarities
+  )
+}
+```
+
+```{r}
+#sort(unique(midfielder_profiles$player))[1:50]
+```
+
+```{r}
+find_similar_players("Declan Rice")
+```
+
+```{r}
+find_similar_players("Bruno Fernandes")
+```
+
+# Archetype-Based Midfielder Profiles
+
+To better understand the stylistic differences between clusters, representative midfielder profiles from each archetype are examined below.
+
+These examples help connect the statistical clustering output to recognizable football roles and tactical interpretations.
+
+```{r}
+midfielder_profiles %>%
+  filter(archetype == "Box-to-Box Midfielders") %>%
+  arrange(desc(g_a_per90)) %>%
+  select(
+    player,
+    squad,
+    g_a_per90,
+    tkl_per90,
+    int_per90
+  ) %>%
+  slice_head(n = 10) %>%
+  gt() %>%
+  tab_header(
+    title = "High-Performing Box-to-Box Midfielders"
+  ) %>%
+  cols_label(
+    player = "Player",
+    squad = "Club",
+    g_a_per90 = "Goals + Assists /90",
+    tkl_per90 = "Tackles Won /90",
+    int_per90 = "Interceptions /90"
+  )
+```
+
+```{r}
+midfielder_profiles %>%
+  filter(archetype == "Attacking Midfielders") %>%
+  arrange(desc(g_a_per90)) %>%
+  select(
+    player,
+    squad,
+    g_a_per90,
+    sh_per90,
+    ast_per90
+  ) %>%
+  slice_head(n = 10) %>%
+  gt() %>%
+  tab_header(
+    title = "Top Attacking Midfield Profiles"
+  )
+```
+
+```{r}
+midfielder_profiles %>%
+  filter(archetype == "Holding Midfielders") %>%
+  arrange(desc(tkl_per90)) %>%
+  select(
+    player,
+    squad,
+    tkl_per90,
+    int_per90,
+    fls_per90
+  ) %>%
+  slice_head(n = 10) %>%
+  gt() %>%
+  tab_header(
+    title = "Top Holding Midfield Profiles"
+  )
+```
+
+------------------------------------------------------------------------
+
+# Conclusion
+
+This project explored how statistical analysis and unsupervised learning techniques can be used to profile modern Premier League midfielders using football performance data derived from FBref.
+
+Through exploratory analysis, per-90 normalization, clustering, and similarity modeling, the project identified several broad midfielder archetypes associated with different tactical and stylistic responsibilities.
+
+The analysis demonstrated how:
+
+-   Per-90 normalization
+
+-   Playing-time thresholds
+
+-   Clustering methods
+
+-   Statistical similarity models
+
+-   Football-specific interpretation
+
+can support player profiling and football scouting workflows.
+
+The project also highlighted the complexity of modern midfield roles. Many players demonstrated overlapping statistical profiles, reflecting the increasing tactical demands placed on midfielders in transition-heavy modern football.
+
+Importantly, the results showed that statistical clustering captures behavioral performance patterns rather than traditional positional labels alone.
+
+While football analytics can provide valuable insights, football performance cannot be fully explained through statistics alone. Tactical context, coaching systems, player responsibilities, and team structure remain essential when interpreting analytical output.
+
+Overall, this project demonstrates how data analysis techniques can support more structured and evidence-based football evaluation while still requiring football-specific contextual understanding.
+
+# Limitations and Future Improvements
+
+Although the dataset provides a broad range of football statistics, several limitations remain within the analysis.
+
+The dataset does not include:
+
+-    Detailed event-level data
+
+-    Progressive carrying metrics
+
+-    Pressure-related statistics
+
+-    Spatial tracking data
+
+-    Tactical positioning information
+
+Future improvements could include:
+
+-    Event-level football data
+
+-   More advanced passing progression metrics
+
+-    Expected possession value models
+
+-   Tracking-based tactical analysis
+
+-    Role-specific positional modeling
+
+Additionally, football context such as tactical systems, coaching structure, and teammate quality remains difficult to fully capture statistically.
